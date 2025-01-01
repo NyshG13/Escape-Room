@@ -17,13 +17,13 @@ introduction2 = pygame.transform.scale(introduction2,(800,600))
 introduction3 = pygame.image.load("assets/intro3.png")
 introduction3 = pygame.transform.scale(introduction3,(800,600))
 
-room1 = pygame.image.load("assets/empty room.jpg")
+room1 = pygame.image.load("assets/best room1.png")
 room1 = pygame.transform.scale(room1,(800,600))
 
 mirror = pygame.image.load("assets/cropped mirror.png")
 mirror = pygame.transform.scale(mirror,(90,150))
 
-mirror_text = pygame.image.load("assets/mirror text.jpg")
+mirror_text = pygame.image.load("assets/painting hidden.png")
 mirror_text = pygame.transform.scale(mirror_text,(800,600))
 
 door = pygame.image.load("assets/door 1-2.jpg")
@@ -32,8 +32,11 @@ door = pygame.transform.scale(door,(100,200))
 sofa = pygame.image.load("assets/sofa 1.jpg")
 sofa = pygame.transform.scale(sofa,(100,200))
 
-mirror_rect = mirror.get_rect()
-mirror_rect.topleft = (450, 150)
+key = pygame.image.load("assets/key 1-1.png")
+key = pygame.transform.scale(key, (50,50))
+
+# mirror_rect = mirror.get_rect()
+mirror_rect = pygame.Rect(650, 150, 60, 65)
 
 dialogue_box_width = 800-20
 dialogue_box_height = 90
@@ -51,15 +54,15 @@ mirror_dialogue_timer = 0
 mirror_dialogue_duration = 3000
 
 dialogue_messages = [
-    "              You are trapped in a haunted mansion...",
-    "         Solve the puzzles to escape before it's too late.",
-    "              The ghosts are watching your every move..."
+    "             You are trapped in a haunted mansion...",
+    "       To get out of this room, you need to find 3 keys..",
+    "   Feel free to explore, but remember that your time is ticking"
 ]
 
 mirror_dialogue_messages = [
-    "               This mirror is so scary...",
-    "    There was first the reflection of a ghost, now a message....",
-    "               What could this possibly mean...?"
+    "               This painting is so scary...",
+    "    Maybe the key is hidden somewhere inside this painting..?",
+    "             Can you search for it before its too late..?"
 ]
 
 
@@ -159,14 +162,14 @@ while running:
         screen.blit(introduction3, (0, 0))
     elif current_state == "room1":
         screen.blit(room1, (0, 0))
-        if dialogue_active:
-           draw_dialogue_box()
-        screen.blit(mirror, (450, 150))
-
+        
     # If the dialogue box is not active and we are on the start screen, show the first message
         if not dialogue_active and current_message_index == 0:
             dialogue_active = True
             dialogue_timer = pygame.time.get_ticks()
+
+        if dialogue_active:
+           draw_dialogue_box()
 
     # Check if the current message has timed out (if the timer exceeds the duration)
         if dialogue_active and pygame.time.get_ticks() - dialogue_timer > dialogue_duration:
@@ -176,7 +179,7 @@ while running:
             else:
                 dialogue_active = False 
 
-        screen.blit(door, (325, 150))
+        # screen.blit(door, (325, 150))
         # screen.blit(sofa, (700, 400))
 
     elif current_state == "mirror text":
@@ -196,6 +199,8 @@ while running:
                 mirror_dialogue_timer = pygame.time.get_ticks()
             else:
                 mirror_dialogue_active = False
+
+        screen.blit(key, (50, 400))
 
     pygame.display.update()
 
