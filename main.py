@@ -26,8 +26,8 @@ mirror = pygame.transform.scale(mirror,(90,150))
 mirror_text = pygame.image.load("assets/painting hidden.png")
 mirror_text = pygame.transform.scale(mirror_text,(800,600))
 
-door = pygame.image.load("assets/door 1-2.jpg")
-door = pygame.transform.scale(door,(100,200))
+door_message = pygame.image.load("assets/door 1-1.png")
+door_message = pygame.transform.scale(door_message,(800,600))
 
 sofa = pygame.image.load("assets/sofa 1.jpg")
 sofa = pygame.transform.scale(sofa,(100,200))
@@ -35,8 +35,29 @@ sofa = pygame.transform.scale(sofa,(100,200))
 key = pygame.image.load("assets/key 1-1.png")
 key = pygame.transform.scale(key, (50,50))
 
+table_objects = pygame.image.load("assets/hidden obj bg1.jpg")
+table_objects = pygame.transform.scale(table_objects,(800,600))
+
+key_table = pygame.image.load("assets/key 1-1.png")
+key_table = pygame.transform.scale(key_table, (40,40))
+
+cupboard_objects = pygame.image.load("assets/cupboard 1-2.jpg")
+cupboard_objects = pygame.transform.scale(cupboard_objects,(800,600))
+
+key_cupboard = pygame.image.load("assets/key 1-1.png")
+key_cupboard = pygame.transform.scale(key_cupboard, (40,40))
+
+room2 = pygame.image.load("assets/room2 best.jpg")
+room2 = pygame.transform.scale(room2, (800,600))
+
 # mirror_rect = mirror.get_rect()
 mirror_rect = pygame.Rect(650, 150, 60, 65)
+table_rect = pygame.Rect(300, 340, 100,100)
+cupboard_rect = pygame.Rect(0,150,90,150)
+door_rect = pygame.Rect(450,200,65,180)
+key_mirror_rect = pygame.Rect(50, 400, 50, 50)
+key_table_rect = pygame.Rect(225, 350, 40, 40)
+key_cupboard_rect = pygame.Rect(600, 450, 40, 40)
 
 dialogue_box_width = 800-20
 dialogue_box_height = 90
@@ -53,6 +74,21 @@ mirror_dialogue_active = False  # Whether the dialogue box is active in the mirr
 mirror_dialogue_timer = 0
 mirror_dialogue_duration = 3000
 
+table_message_index = 0
+table_dialogue_active = False  # Whether the dialogue box is active in the table scene
+table_dialogue_timer = 0
+table_dialogue_duration = 3000
+
+cupboard_message_index = 0
+cupboard_dialogue_active = False
+cupboard_dialogue_timer = 0
+cupboard_dialogue_duration = 3000
+
+door_message_index = 0
+door_dialogue_active = False
+door_dialogue_timer = 0
+door_dialogue_duration = 3000
+
 dialogue_messages = [
     "             You are trapped in a haunted mansion...",
     "       To get out of this room, you need to find 3 keys..",
@@ -65,6 +101,25 @@ mirror_dialogue_messages = [
     "             Can you search for it before its too late..?"
 ]
 
+table_dialogue_messages = [
+    "             What a mess this table is in...",
+    "             Maybe the key is hidden here..?",
+    "     But will you be able to find it before the ghosts find you?"
+]
+
+cupboard_dialogue_messages = [
+    "           Everything here is a mess ... even this cupboard",
+    "            Could a key be hidden somewhere in here..?",
+    "       But how will you find it before the ghosts come for you?"
+]
+
+door_dialogue_messages = [
+    "                 The door is locked..",
+    "         It wont open unless you find those 3 keys..",
+    "      But will you be able to find them? HA HA HA"
+]
+
+inventory =['']
 
 def draw_dialogue_box():
     pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
@@ -91,6 +146,12 @@ def draw_text_button():
     screen.blit(button_text, (button_x, button_y))
     return button_x, button_y, button_width, button_height
 
+def draw_inventory():
+    pygame.draw.rect(screen, (0, 0, 0), (10, 10, 150, 50))  # Inventory box
+    font = pygame.font.Font(None, 24)
+    text = font.render(f"Inventory: {', '.join(inventory)}", True, (255, 255, 255))
+    screen.blit(text, (15, 15))
+
 
 def start_game():
     return "introduction1"
@@ -106,6 +167,18 @@ def move_to_room1():
 
 def move_to_mirror():
     return "mirror text"
+
+def move_to_table():
+    return "table objects"
+
+def move_to_cupboard():
+    return "cupboard objects"
+
+def move_to_door():
+    return "door key put"
+
+def move_to_room2():
+    return "room2"
 
 current_state = "start"
 
@@ -131,6 +204,47 @@ while running:
                     mirror_dialogue_active = True  # Activate the dialogue box in the mirror scene
                     mirror_message_index = 0  # Reset the dialogue index
                     mirror_dialogue_timer = pygame.time.get_ticks()
+
+                if table_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_table()
+                    table_dialogue_active = True  # Activate the dialogue box in the table scene
+                    table_message_index = 0  # Reset the dialogue index
+                    table_dialogue_timer = pygame.time.get_ticks()
+
+                if cupboard_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_cupboard()
+                    cupboard_dialogue_active = True  # Activate the dialogue box in the cupboard scene
+                    cupboard_message_index = 0  # Reset the dialogue index
+                    cupboard_dialogue_timer = pygame.time.get_ticks()
+
+                if door_rect.collidepoint(mouse_x, mouse_y):
+                    if inventory[0] == "3 keys":
+                        current_state = move_to_room2()
+                    else:
+                        current_state = move_to_door()
+                        door_dialogue_active = True  # Activate the dialogue box in the cupboard scene
+                        door_message_index = 0  # Reset the dialogue index
+                        door_dialogue_timer = pygame.time.get_ticks()
+
+            elif current_state == "mirror text":
+                if key_mirror_rect.collidepoint(mouse_x, mouse_y):
+                    if "key" not in inventory:
+                        inventory[0] = "1 key"
+                        current_state = move_to_room1()
+
+            elif current_state == "table objects":
+                if key_table_rect.collidepoint(mouse_x, mouse_y):
+                    if "key" not in inventory:
+                        inventory[0] ="2 keys"
+                        current_state = move_to_room1()
+                        
+
+            elif current_state == "cupboard objects":
+                if key_cupboard_rect.collidepoint(mouse_x, mouse_y):
+                    if "key" not in inventory:
+                        inventory[0] ="3 keys"
+                        current_state = move_to_room1()
+                        
 
         if event.type == pygame.KEYDOWN:
             # if event.key == pygame.K_RETURN:  
@@ -162,6 +276,8 @@ while running:
         screen.blit(introduction3, (0, 0))
     elif current_state == "room1":
         screen.blit(room1, (0, 0))
+
+        # pygame.draw.rect(screen, (225,255,255), door_rect)
         
     # If the dialogue box is not active and we are on the start screen, show the first message
         if not dialogue_active and current_message_index == 0:
@@ -179,8 +295,10 @@ while running:
             else:
                 dialogue_active = False 
 
-        # screen.blit(door, (325, 150))
-        # screen.blit(sofa, (700, 400))
+        # if len(inventory) == 3:
+
+  
+
 
     elif current_state == "mirror text":
         screen.blit(mirror_text, (0, 0))
@@ -199,8 +317,90 @@ while running:
                 mirror_dialogue_timer = pygame.time.get_ticks()
             else:
                 mirror_dialogue_active = False
-
         screen.blit(key, (50, 400))
 
+        # pygame.draw.rect(screen, (255, 0, 0), key_mirror_rect)
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room1"
+
+    elif current_state == "table objects":
+        screen.blit(table_objects, (0,0))
+
+        if table_dialogue_active:
+            pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
+            pygame.draw.rect(screen, (128, 128, 128), (dialogue_box_x + 5, dialogue_box_y + 5, dialogue_box_width - 10, dialogue_box_height - 10))
+
+            # Render the current dialogue message
+            table_message_text = font.render(table_dialogue_messages[table_message_index], True, (0, 0, 0))
+            screen.blit(table_message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
+
+        # Auto-progress the dialogue based on timer (optional)
+        if table_dialogue_active and pygame.time.get_ticks() - table_dialogue_timer > table_dialogue_duration:
+            if table_message_index < len(table_dialogue_messages) - 1:
+                table_message_index += 1
+                table_dialogue_timer = pygame.time.get_ticks()
+            else:
+                table_dialogue_active = False
+
+        screen.blit(key_table, (225,350))
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room1"
+
+    elif current_state == "cupboard objects":
+        screen.blit(cupboard_objects, (0,0))
+
+        if cupboard_dialogue_active:
+            pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
+            pygame.draw.rect(screen, (128, 128, 128), (dialogue_box_x + 5, dialogue_box_y + 5, dialogue_box_width - 10, dialogue_box_height - 10))
+
+            # Render the current dialogue message
+            cupboard_message_text = font.render(cupboard_dialogue_messages[cupboard_message_index], True, (0, 0, 0))
+            screen.blit(cupboard_message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
+
+        # Auto-progress the dialogue based on timer (optional)
+        if cupboard_dialogue_active and pygame.time.get_ticks() - cupboard_dialogue_timer > cupboard_dialogue_duration:
+            if cupboard_message_index < len(cupboard_dialogue_messages) - 1:
+                cupboard_message_index += 1
+                cupboard_dialogue_timer = pygame.time.get_ticks()
+            else:
+                cupboard_dialogue_active = False
+
+        screen.blit(key_table, (600,450))
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room1"
+
+    elif current_state == "door key put":
+        screen.blit(door_message, (0,0))
+
+        if door_dialogue_active:
+            pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
+            pygame.draw.rect(screen, (128, 128, 128), (dialogue_box_x + 5, dialogue_box_y + 5, dialogue_box_width - 10, dialogue_box_height - 10))
+
+            # Render the current dialogue message
+            door_message_text = font.render(door_dialogue_messages[door_message_index], True, (0, 0, 0))
+            screen.blit(door_message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
+
+        # Auto-progress the dialogue based on timer (optional)
+        if door_dialogue_active and pygame.time.get_ticks() - door_dialogue_timer > door_dialogue_duration:
+            if door_message_index < len(door_dialogue_messages) - 1:
+                door_message_index += 1
+                door_dialogue_timer = pygame.time.get_ticks()
+            else:
+                door_dialogue_active = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room1"
+
+    elif current_state == "room2":
+        screen.blit(room2, (0,0))
+
+    draw_inventory()
     pygame.display.update()
 
