@@ -50,6 +50,15 @@ key_cupboard = pygame.transform.scale(key_cupboard, (40,40))
 room2 = pygame.image.load("assets/room2 best.jpg")
 room2 = pygame.transform.scale(room2, (800,600))
 
+piano = pygame.image.load("assets/piano better text.png")
+piano = pygame.transform.scale(piano, (800,600))
+
+book = pygame.image.load("assets/book text.png")
+book = pygame.transform.scale(book, (800,600))  
+
+door2 = pygame.image.load("assets/door 1-1.png")
+door2 = pygame.transform.scale(door2, (800,600))
+
 # mirror_rect = mirror.get_rect()
 mirror_rect = pygame.Rect(650, 150, 60, 65)
 table_rect = pygame.Rect(300, 340, 100,100)
@@ -58,6 +67,9 @@ door_rect = pygame.Rect(450,200,65,180)
 key_mirror_rect = pygame.Rect(50, 400, 50, 50)
 key_table_rect = pygame.Rect(225, 350, 40, 40)
 key_cupboard_rect = pygame.Rect(600, 450, 40, 40)
+piano_rect = pygame.Rect(370, 320, 50, 60)
+book_rect = pygame.Rect(30, 540, 75, 30)
+door2_rect = pygame.Rect(350, 80, 85, 220)
 
 dialogue_box_width = 800-20
 dialogue_box_height = 90
@@ -89,6 +101,11 @@ door_dialogue_active = False
 door_dialogue_timer = 0
 door_dialogue_duration = 3000
 
+room2_message_index = 0
+room2_dialogue_active = False
+room2_dialogue_timer = 0
+room2_dialogue_duration = 3000
+
 dialogue_messages = [
     "             You are trapped in a haunted mansion...",
     "       To get out of this room, you need to find 3 keys..",
@@ -119,6 +136,12 @@ door_dialogue_messages = [
     "      But will you be able to find them? HA HA HA"
 ]
 
+room2_dialogue_messages = [
+    "          you might have crossed the first room..",
+    "        but you are still trapped in this mansion..",
+    "and you wont get out of this room, especially since your time is limited"
+]
+
 inventory =['']
 
 def draw_dialogue_box():
@@ -127,6 +150,14 @@ def draw_dialogue_box():
     
     # Render the current message
     message_text = font.render(dialogue_messages[current_message_index], True, (0, 0, 0))
+    screen.blit(message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
+
+def draw_dialogue_box_2():
+    pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
+    pygame.draw.rect(screen, (128,128,128), (dialogue_box_x + 5, dialogue_box_y + 5, dialogue_box_width - 10, dialogue_box_height - 10))
+    
+    # Render the current message
+    message_text = font.render(room2_dialogue_messages[current_message_index], True, (0, 0, 0))
     screen.blit(message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
 
 font = pygame.font.Font("assets/Zombified.ttf", 48)
@@ -179,6 +210,15 @@ def move_to_door():
 
 def move_to_room2():
     return "room2"
+
+def move_to_piano():
+    return "piano text"
+
+def move_to_book():
+    return "book text"
+
+def move_to_door2():
+    return "door2"
 
 current_state = "start"
 
@@ -243,7 +283,25 @@ while running:
                 if key_cupboard_rect.collidepoint(mouse_x, mouse_y):
                     if "key" not in inventory:
                         inventory[0] ="3 keys"
-                        current_state = move_to_room1()
+                        current_state = move_to_room1()    
+
+            elif current_state == "room2":
+                if piano_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_piano()  
+
+                if book_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_book()    
+
+                if door2_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_door2()
+
+            room2_dialogue_active = True  # Activate the dialogue box in the cupboard scene
+            room2_message_index = 0  # Reset the dialogue index
+            room2_dialogue_timer = pygame.time.get_ticks()
+                
+                
+
+                
                         
 
         if event.type == pygame.KEYDOWN:
@@ -400,6 +458,56 @@ while running:
 
     elif current_state == "room2":
         screen.blit(room2, (0,0))
+
+        if room2_dialogue_active:
+            pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
+            pygame.draw.rect(screen, (128, 128, 128), (dialogue_box_x + 5, dialogue_box_y + 5, dialogue_box_width - 10, dialogue_box_height - 10))
+
+            # Render the current dialogue message
+            room2_message_text = font.render(room2_dialogue_messages[room2_message_index], True, (0, 0, 0))
+            screen.blit(room2_message_text, (dialogue_box_x + 10, dialogue_box_y + 30))
+
+        # Auto-progress the dialogue based on timer (optional)
+        if room2_dialogue_active and pygame.time.get_ticks() - room2_dialogue_timer > room2_dialogue_duration:
+            if room2_message_index < len(room2_dialogue_messages) - 1:
+                room2_message_index += 1
+                room2_dialogue_timer = pygame.time.get_ticks()
+            else:
+                room2_dialogue_active = False
+
+        # pygame.draw.rect(screen, (225,255,255), door2_rect)
+
+    #     if not dialogue_active and current_message_index == 0:
+    #         dialogue_active = True
+    #         dialogue_timer = pygame.time.get_ticks()
+
+    #     if dialogue_active:
+    #        draw_dialogue_box_2()
+
+    # # Check if the current message has timed out (if the timer exceeds the duration)
+    #     if dialogue_active and pygame.time.get_ticks() - dialogue_timer > dialogue_duration:
+    #         if current_message_index < len(room2_dialogue_messages) - 1:
+    #             current_message_index += 1
+    #             dialogue_timer = pygame.time.get_ticks()  # Reset the timer
+    #         else:
+    #             dialogue_active = False
+
+    elif current_state == "piano text":
+        screen.blit(piano, (0,0))
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room2"
+
+    elif current_state == "book text":
+        screen.blit(book, (0,0))
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room2"
+        
+    elif current_state == "door2":
+        screen.blit(door2, (0,0))
 
     draw_inventory()
     pygame.display.update()
