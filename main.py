@@ -1,6 +1,8 @@
 import pygame
+# import sliding_game
 
 pygame.init()
+pygame.mixer.init()
 
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Mystery Rooms")
@@ -56,8 +58,14 @@ piano = pygame.transform.scale(piano, (800,600))
 book = pygame.image.load("assets/book text.png")
 book = pygame.transform.scale(book, (800,600))  
 
-door2 = pygame.image.load("assets/door 1-1.png")
+door2 = pygame.image.load("assets/door 2 better.png")
 door2 = pygame.transform.scale(door2, (800,600))
+
+room3 = pygame.image.load("assets/room3 maybe.jpg")
+room3 = pygame.transform.scale(room3, (800,600))
+
+room4 = pygame.image.load("assets/room4-1.png")
+room4 = pygame.transform.scale(room4, (800,600))
 
 # mirror_rect = mirror.get_rect()
 mirror_rect = pygame.Rect(650, 150, 60, 65)
@@ -70,6 +78,11 @@ key_cupboard_rect = pygame.Rect(600, 450, 40, 40)
 piano_rect = pygame.Rect(370, 320, 50, 60)
 book_rect = pygame.Rect(30, 540, 75, 30)
 door2_rect = pygame.Rect(350, 80, 85, 220)
+user_text = ""
+candle_rect = pygame.Rect(90,220, 70, 90)
+boat_rect = pygame.Rect(625, 375, 70, 100)
+door3_rect = pygame.Rect(475, 210, 90, 200)
+rubble_rect = pygame.Rect(300,400, 90,70)
 
 dialogue_box_width = 800-20
 dialogue_box_height = 90
@@ -105,6 +118,11 @@ room2_message_index = 0
 room2_dialogue_active = False
 room2_dialogue_timer = 0
 room2_dialogue_duration = 3000
+
+# correct_password = "JIGSAW"  # The correct password
+# player_input = ""          # Stores the current input from the player
+# puzzle_active = True       # Whether the puzzle is active
+# door_unlocked = False
 
 dialogue_messages = [
     "             You are trapped in a haunted mansion...",
@@ -162,6 +180,17 @@ def draw_dialogue_box_2():
 
 font = pygame.font.Font("assets/Zombified.ttf", 48)
 
+# def draw_puzzle():
+#     pygame.draw.rect(screen, (0, 0, 0), (200, 300, 400, 100))  # Input box
+#     pygame.draw.rect(screen, (255, 255, 255), (205, 305, 390, 90))  # White border
+
+#     # Render input text
+#     input_text = font.render(player_input, True, (0, 0, 0))
+#     screen.blit(input_text, (220, 330))
+
+#     # Render instructions
+#     instructions = font.render("Enter the password:", True, (0, 0, 0))
+#     screen.blit(instructions, (200, 250))
 
 
 def draw_text_button():
@@ -220,7 +249,23 @@ def move_to_book():
 def move_to_door2():
     return "door2"
 
+def move_to_room3():
+    return "room3"
+
+def move_to_candle():
+    return "candle"
+
+def move_to_boat():
+    return "boat"
+
+def move_to_room4():
+    return "room4"
+
+def move_to_rubble():
+    return "rubble"
+
 current_state = "start"
+current_music = None
 
 running = True
 while running:
@@ -228,6 +273,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:  # Check for Enter key
+                if user_text.upper() == "JIGSAW" and current_state == "door2":
+                    current_state = move_to_room3()
+                # else:
+                    # i will add wrong password sound later
+            elif event.key == pygame.K_BACKSPACE:  # Handle backspace
+                user_text = user_text[:-1]
+            else:
+                if event.unicode.isprintable():
+                    user_text += event.unicode  
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -283,7 +340,20 @@ while running:
                 if key_cupboard_rect.collidepoint(mouse_x, mouse_y):
                     if "key" not in inventory:
                         inventory[0] ="3 keys"
-                        current_state = move_to_room1()    
+                        current_state = move_to_room1() 
+
+            elif current_state == "room3":
+                if candle_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_candle()
+
+                if boat_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_boat()
+
+                if door3_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_room4()
+
+                if rubble_rect.collidepoint(mouse_x, mouse_y):
+                    current_state = move_to_rubble()
 
             elif current_state == "room2":
                 if piano_rect.collidepoint(mouse_x, mouse_y):
@@ -298,11 +368,6 @@ while running:
             room2_dialogue_active = True  # Activate the dialogue box in the cupboard scene
             room2_message_index = 0  # Reset the dialogue index
             room2_dialogue_timer = pygame.time.get_ticks()
-                
-                
-
-                
-                        
 
         if event.type == pygame.KEYDOWN:
             # if event.key == pygame.K_RETURN:  
@@ -326,14 +391,30 @@ while running:
     if current_state == "start":         
         screen.blit(bg_beginning, (0, 0))
         draw_text_button()
+
+        if current_music != 'bg for entry.mp3':
+            pygame.mixer.music.load('music/bg for entry.mp3')
+            pygame.mixer.music.set_volume(1.0)  
+            pygame.mixer.music.play(-1)  
+            current_music = 'bg for entry.mp3'
+
+        
     elif current_state == "introduction1":
-        screen.blit(introduction1, (0,0))
+        screen.blit(introduction1, (0,0))        
+        
     elif current_state == "introduction2":
         screen.blit(introduction2, (0, 0))
+        
     elif current_state == "introduction3":
         screen.blit(introduction3, (0, 0))
+        
     elif current_state == "room1":
         screen.blit(room1, (0, 0))
+        if current_music != 'room1 new.mp3':
+            pygame.mixer.music.load('music/room1 new.mp3')
+            pygame.mixer.music.set_volume(1.0)  # Set volume to maximum
+            pygame.mixer.music.play(-1)  # Loop the music indefinitely
+            current_music = 'room1 new.mp3'
 
         # pygame.draw.rect(screen, (225,255,255), door_rect)
         
@@ -356,8 +437,6 @@ while running:
         # if len(inventory) == 3:
 
   
-
-
     elif current_state == "mirror text":
         screen.blit(mirror_text, (0, 0))
         if mirror_dialogue_active:
@@ -458,6 +537,11 @@ while running:
 
     elif current_state == "room2":
         screen.blit(room2, (0,0))
+        if current_music != 'room2 better.mp3':
+            pygame.mixer.music.load('music/room2 better.mp3')
+            pygame.mixer.music.set_volume(1.0)  # Set volume to maximum
+            pygame.mixer.music.play(-1)  # Loop the music indefinitely
+            current_music = 'room2 better.mp3'
 
         if room2_dialogue_active:
             pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
@@ -475,22 +559,7 @@ while running:
             else:
                 room2_dialogue_active = False
 
-        # pygame.draw.rect(screen, (225,255,255), door2_rect)
-
-    #     if not dialogue_active and current_message_index == 0:
-    #         dialogue_active = True
-    #         dialogue_timer = pygame.time.get_ticks()
-
-    #     if dialogue_active:
-    #        draw_dialogue_box_2()
-
-    # # Check if the current message has timed out (if the timer exceeds the duration)
-    #     if dialogue_active and pygame.time.get_ticks() - dialogue_timer > dialogue_duration:
-    #         if current_message_index < len(room2_dialogue_messages) - 1:
-    #             current_message_index += 1
-    #             dialogue_timer = pygame.time.get_ticks()  # Reset the timer
-    #         else:
-    #             dialogue_active = False
+        # pygame.draw.rect(screen, (225,255,255), door2_rect
 
     elif current_state == "piano text":
         screen.blit(piano, (0,0))
@@ -508,6 +577,66 @@ while running:
         
     elif current_state == "door2":
         screen.blit(door2, (0,0))
+        
+        input_surface = font.render(user_text, True, (255,255,255))
+        screen.blit(input_surface, (600, 520))
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room2"
+
+    elif current_state == "room3":
+        screen.blit(room3, (0,0))
+        if current_music != 'room3 new.mp3':
+            pygame.mixer.music.load('music/room3 new.mp3')
+            pygame.mixer.music.set_volume(1.0)  # Set volume to maximum
+            pygame.mixer.music.play(-1)  # Loop the music indefinitely
+            current_music = 'room3 new.mp3'
+        # pygame.draw.rect(screen, (225,255,255), rubble_rect)
+
+    elif current_state == "candle":
+
+        import sliding_game
+        sliding_game
+
+        if sliding_game.current_state_game =="room3":
+            current_state = "room3"
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room3"
+
+    elif current_state == "boat":
+
+        import spot_the_diff
+        spot_the_diff
+        
+        if spot_the_diff.current_state_game2 == "room3":
+            current_state = "room3"
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room3"
+
+    elif current_state == "room4":
+        screen.blit(room4, (0,0))
+        if current_music != 'room4.mp3':
+            pygame.mixer.music.load('music/room4.mp3')
+            pygame.mixer.music.set_volume(1.0)  # Set volume to maximum
+            pygame.mixer.music.play(-1)  # Loop the music indefinitely
+            current_music = 'room4.mp3'       
+
+    elif current_state == "rubble":
+        
+        import memory_game
+        memory_game
+
+        if memory_game.current_room_state_game3 == "room3":
+            current_state = "room3"
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:  # Check if the Escape key is pressed
+                  current_state = "room3"
 
     draw_inventory()
     pygame.display.update()
