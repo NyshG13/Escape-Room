@@ -3,6 +3,8 @@ import pygame
 pygame.init()
 pygame.mixer.init()
 
+from spot_new import spot_the_difference
+
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Mystery Rooms")
 
@@ -252,7 +254,7 @@ def move_to_game_over():
 def move_to_door3():
     return "door3"
 
-current_state = "start"
+current_state = "room3"
 current_music = None
 Game_state_2 = 0
 
@@ -340,7 +342,7 @@ while running:
                     current_state = move_to_candle()
 
                 if door3_rect.collidepoint(mouse_x, mouse_y):
-                    if Game_state_2 == 2:
+                    if Game_state_2 == 3:
                        current_state = move_to_game_over()
                     
                     else:
@@ -601,13 +603,15 @@ while running:
                   current_state = "room3"
 
     elif current_state == "rubble":
-
-        import spot_the_diff
-        spot_the_diff
+        returned_state = spot_the_difference()
         
-        if spot_the_diff.current_state_game2 == "room3":
+        if returned_state == "room3":
             current_state = "room3"
             Game_state_2 += 1
+            pygame.mixer.music.load('music/room3 new.mp3')
+            pygame.mixer.music.set_volume(1.0) 
+            pygame.mixer.music.play(-1) 
+            current_music = 'room3 new.mp3'
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:  
@@ -621,7 +625,6 @@ while running:
             pygame.mixer.music.set_volume(1.0)  
             pygame.mixer.music.play(-1)  
             current_music = 'room4.mp3'  
-
 
         if door3_dialogue_active:
             pygame.draw.rect(screen, (0, 0, 0), (dialogue_box_x, dialogue_box_y, dialogue_box_width, dialogue_box_height))
