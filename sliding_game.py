@@ -45,8 +45,8 @@ continue_rect.center = (window_width//2, window_height//2 + 150)
 img_selected = None 
 is_game_over = False
 
-rows = 2
-cols = 2
+rows = 5
+cols = 5
 num_cells = rows*cols 
 
 cell_width = window_width//rows
@@ -70,12 +70,6 @@ for i in range(num_cells):
     #now i wanna show these images randomly, i dont want to show them according to their order
     #so i will add a random position so that images are shown according to that not according to their order 
     #so i wanna generate a random number between 0 to 8, and once that number is generated i dont want it to repeat 
-
-# def move_to_room3():
-#     global current_state
-#     current_state = "room3"
-
-# current_state = "candle"
 
 running = True 
 while running:
