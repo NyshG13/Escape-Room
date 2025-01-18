@@ -20,6 +20,9 @@ introduction2 = pygame.transform.scale(introduction2,(800,600))
 introduction3 = pygame.image.load("assets/intro3.png")
 introduction3 = pygame.transform.scale(introduction3,(800,600))
 
+rules_page = pygame.image.load("assets/RULES TO PLAY.png")
+rules_page = pygame.transform.scale(rules_page,(800,600))
+
 room1 = pygame.image.load("assets/room1.png")
 room1 = pygame.transform.scale(room1,(800,600))
 
@@ -190,12 +193,31 @@ def draw_text_button():
     screen.blit(button_text, (button_x, button_y))
     return button_x, button_y, button_width, button_height
 
-def draw_inventory():
-    pygame.draw.rect(screen, (0, 0, 0), (10, 10, 150, 50))  
-    font = pygame.font.Font(None, 24)
-    text = font.render(f"Inventory: {', '.join(inventory)}", True, (255, 255, 255))
-    screen.blit(text, (15, 15))
+# def draw_inventory():
+#     pygame.draw.rect(screen, (0, 0, 0), (10, 10, 150, 50))  
+#     font = pygame.font.Font(None, 24)
+#     text = font.render(f"Inventory: {', '.join(inventory)}", True, (255, 255, 255))
+#     screen.blit(text, (15, 15))
 
+def draw_inventory(screen, items):
+    inventory_width = 150
+    inventory_height = 50
+    inventory_x = 10
+    inventory_y = 10
+    inventory_border_color = (0,0,0)
+    inventory_background_color = (204, 195, 185)
+    inventory_border_thickness = 5
+
+    pygame.draw.rect(screen, inventory_border_color, (inventory_x - inventory_border_thickness, inventory_y - inventory_border_thickness, inventory_width + 2 * inventory_border_thickness, inventory_height + 2 * inventory_border_thickness), border_radius=15)
+    pygame.draw.rect(screen, inventory_background_color, (inventory_x, inventory_y, inventory_width, inventory_height), border_radius=15)
+    
+    font = pygame.font.Font('memory game/fonts/HallowenInline.ttf', 36)  
+    item_y = inventory_y + 10  
+
+    for item in items:
+        item_text = font.render(item, True, (44, 31, 22))  #coffee color
+        screen.blit(item_text, (inventory_x + 37, item_y))
+        item_y += 40 
 
 def start_game():
     return "introduction1"
@@ -205,6 +227,9 @@ def move_to_intro2():
 
 def move_to_intro3():
     return "introduction3"
+
+def move_to_rules():
+    return "rules"
 
 def move_to_room1():
     return "room1"
@@ -254,7 +279,7 @@ def move_to_game_over():
 def move_to_door3():
     return "door3"
 
-current_state = "room3"
+current_state = "start"
 current_music = None
 Game_state_2 = 0
 
@@ -384,6 +409,8 @@ while running:
                 elif current_state == "introduction2":
                     current_state = move_to_intro3()
                 elif current_state == "introduction3":
+                    current_state = move_to_rules()
+                elif current_state == "rules":
                     current_state = move_to_room1()
 
         if event.type == pygame.KEYDOWN:
@@ -414,6 +441,9 @@ while running:
         
     elif current_state == "introduction3":
         screen.blit(introduction3, (0, 0))
+    
+    elif current_state == "rules":
+        screen.blit(rules_page, (0, 0))
         
     elif current_state == "room1":
         screen.blit(room1, (0, 0))
@@ -423,7 +453,7 @@ while running:
             pygame.mixer.music.play(-1)  
             current_music = 'room1 new.mp3'
 
-        draw_inventory()
+        draw_inventory(screen, inventory)
 
         if not dialogue_active and current_message_index == 0:
             dialogue_active = True
@@ -455,7 +485,7 @@ while running:
             else:
                 mirror_dialogue_active = False
         screen.blit(key, (50, 400))
-        draw_inventory()
+        draw_inventory(screen, inventory)
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -479,7 +509,7 @@ while running:
                 table_dialogue_active = False
 
         screen.blit(key_table, (225,350))
-        draw_inventory()
+        draw_inventory(screen, inventory)
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:  
@@ -504,7 +534,7 @@ while running:
                 cupboard_dialogue_active = False
 
         screen.blit(key_table, (600,450))
-        draw_inventory()
+        draw_inventory(screen, inventory)
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:  
@@ -528,7 +558,7 @@ while running:
             else:
                 door_dialogue_active = False
         
-        draw_inventory()
+        draw_inventory(screen, inventory)
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:

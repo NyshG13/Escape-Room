@@ -45,8 +45,8 @@ continue_rect.center = (window_width//2, window_height//2 + 150)
 img_selected = None 
 is_game_over = False
 
-rows = 5
-cols = 5
+rows = 2
+cols = 2
 num_cells = rows*cols 
 
 cell_width = window_width//rows
@@ -74,6 +74,9 @@ for i in range(num_cells):
 running = True 
 while running:
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN and is_game_over:
             running = False
 

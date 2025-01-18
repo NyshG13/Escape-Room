@@ -1,8 +1,11 @@
-
 import pygame
 import cv2  
 
 pygame.init()
+pygame.mixer.init()
+
+pygame.mixer.music.load('music/game over music.mp3')
+pygame.mixer.music.play(-1)
 
 WHITE = (255, 255, 255)
 
@@ -19,9 +22,13 @@ game_over_text = font_title.render('GAME COMPLETE', True, WHITE)
 game_over_rect = game_over_text.get_rect()
 game_over_rect.center = (800//2, 600//2)
 
-congrats_text = font_content.render('Thank you for playing the game', True, WHITE)
+congrats_text = font_content.render('You saved the souls and now you are free', True, WHITE)
 congrats_rect = congrats_text.get_rect()
 congrats_rect.center = (800//2, 600//2 + 50)
+
+thank_you_text = font_content.render('Thank you for playing', True, WHITE)
+thank_you_rect = thank_you_text.get_rect()
+thank_you_rect.center = (800//2, 600//2 + 100)
 
 # Function to play the video using OpenCV
 def play_video():
@@ -51,6 +58,7 @@ def play_video():
 
         screen.blit(game_over_text, game_over_rect)
         screen.blit(congrats_text, congrats_rect)
+        screen.blit(thank_you_text, thank_you_rect)
         pygame.display.update()
 
         for event in pygame.event.get():
