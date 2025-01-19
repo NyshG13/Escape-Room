@@ -20,7 +20,7 @@ Escape Room is an interactive super-natural themed puzzle, set in an eerie mansi
 1. Open a terminal or command prompt.
 2. Clone the repository using Git:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/NyshG13/Escape-Room.git
 3. Navigate to the project folder:
    ```bash
    cd mystery-rooms-escape-game
